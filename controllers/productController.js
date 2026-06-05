@@ -1,52 +1,10 @@
 const Product = require("../models/Product");
 const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 
-// CREATE PRODUCT
-// exports.createProduct = async (req, res) => {
-//   try {
-//     const {
-//       title,
-//       category,
-//       description,
-//       price,
-//       specifications,
-//     } = req.body;
-
-//     const imageUrls = req.files ? req.files.map(file => file.path) : [];
-
-//     let specs = [];
-
-//     if (specifications) {
-//       try {
-//         specs = typeof specifications === "string"
-//           ? JSON.parse(specifications)
-//           : specifications;
-//       } catch (err) {
-//         specs = [];
-//       }
-//     }
-
-//     const product = await Product.create({
-//       title,
-//       category,
-//       description,
-//       price,
-//       specifications: specs,
-//       images: imageUrls,
-//     });
-
-//     res.status(201).json(product);
-
-//   } catch (error) {
-//     res.status(500).json({
-//       message: error.message,
-//     });
-//   }
-// };
 
 exports.createProduct = async (req, res) => {
   try {
-
     console.log("BODY:", req.body);
     console.log("FILES:", req.files);
 
@@ -58,9 +16,17 @@ exports.createProduct = async (req, res) => {
       specifications,
     } = req.body;
 
-    const imageUrls = req.files
-      ? req.files.map(file => file.path)
-      : [];
+    // ✅ UPLOAD IMAGES PROPERLY
+    let imageUrls = [];
+
+    if (req.files && req.files.length > 0) {
+      imageUrls = await Promise.all(
+        req.files.map(async (file) => {
+          const result = await uploadToCloudinary(file.buffer);
+          return result.secure_url;
+        })
+      );
+    }
 
     console.log("IMAGE URLS:", imageUrls);
 
@@ -83,12 +49,8 @@ exports.createProduct = async (req, res) => {
       images: imageUrls,
     });
 
-    console.log("SAVED PRODUCT:", product);
-
     res.status(201).json(product);
-
   } catch (error) {
-
     console.log("CREATE ERROR:", error);
 
     res.status(500).json({
@@ -96,15 +58,6 @@ exports.createProduct = async (req, res) => {
     });
   }
 };
-// GET PRODUCTS
-// exports.getProducts = async (req, res) => {
-//   try {
-//     const products = await Product.find().sort({ createdAt: -1 });
-//     res.json(products);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 exports.getProducts = async (req, res) => {
   try {
@@ -117,27 +70,7 @@ exports.getProducts = async (req, res) => {
 
 
 
-// UPDATE PRODUCT
-// exports.updateProduct = async (req, res) => {
-//   try {
-//     const product = await Product.findById(req.params.id);
 
-//     if (!product) {
-//       return res.status(404).json({ message: "Product not found" });
-//     }
-
-//     const updated = await Product.findByIdAndUpdate(
-//       req.params.id,
-//       req.body,
-//       { new: true }
-//     );
-
-//     res.json(updated);
-
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 // UPDATE PRODUCT
 exports.updateProduct = async (req, res) => {

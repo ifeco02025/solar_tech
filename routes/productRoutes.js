@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const multer = require("multer");
-const { CloudinaryStorage } = require("multer");
+// const { CloudinaryStorage } = require("multer");
 const cloudinary = require("../config/cloudinary");
 
 const verifyAdmin = require("../middleware/verifyAdmin");
@@ -24,16 +24,11 @@ const {
 // ========================
 // CLOUDINARY STORAGE
 // ========================
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "solar-products",
-    allowed_formats: ["jpg", "png", "jpeg", "webp"],
-  },
-});
+const multer = require("multer");
+const cloudinary = require("../config/cloudinary");
 
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
-
 
 // ========================
 // ROUTES
