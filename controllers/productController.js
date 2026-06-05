@@ -1,32 +1,10 @@
 const Product = require("../models/Product");
 const cloudinary = require("../config/cloudinary");
-const streamifier = require("streamifier");
-
-
-// ========================
-// UPLOAD TO CLOUDINARY
-// ========================
-const uploadToCloudinary = (fileBuffer) => {
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "solar-products",
-      },
-      (error, result) => {
-        if (result) resolve(result);
-        else reject(error);
-      }
-    );
-
-    streamifier.createReadStream(fileBuffer).pipe(stream);
-  });
-};
-
-
 
 
 exports.createProduct = async (req, res) => {
   try {
+
     console.log("BODY:", req.body);
     console.log("FILES:", req.files);
 
@@ -38,17 +16,9 @@ exports.createProduct = async (req, res) => {
       specifications,
     } = req.body;
 
-    // ✅ UPLOAD IMAGES PROPERLY
-    let imageUrls = [];
-
-    if (req.files && req.files.length > 0) {
-      imageUrls = await Promise.all(
-        req.files.map(async (file) => {
-          const result = await uploadToCloudinary(file.buffer);
-          return result.secure_url;
-        })
-      );
-    }
+    const imageUrls = req.files
+      ? req.files.map(file => file.path)
+      : [];
 
     console.log("IMAGE URLS:", imageUrls);
 
@@ -71,8 +41,12 @@ exports.createProduct = async (req, res) => {
       images: imageUrls,
     });
 
+    console.log("SAVED PRODUCT:", product);
+
     res.status(201).json(product);
+
   } catch (error) {
+
     console.log("CREATE ERROR:", error);
 
     res.status(500).json({
@@ -80,6 +54,7 @@ exports.createProduct = async (req, res) => {
     });
   }
 };
+
 
 exports.getProducts = async (req, res) => {
   try {
