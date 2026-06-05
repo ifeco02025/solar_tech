@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Edit Product</title>
+
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<div class="main-content">
+
+  <h1>Edit Product</h1>
+
+  <form id="editForm" class="product-form">
+
+    <input type="text" id="title" placeholder="Title">
+
+    <input type="text" id="price" placeholder="Price">
+
+    <input type="text" id="category" placeholder="Category">
+
+    <textarea id="description" placeholder="description"></textarea>
+
+    <textarea id="specifications" placeholder="specifications"></textarea>
+
+    <input type="file" id="images" multiple>
+
+    <div id="preview"></div>
+
+    <button type="submit">
+      Update Product
+    </button>
+
+  </form>
+
+</div>
+
+<script>
+
+const token = localStorage.getItem("token");
+
+const params = new URLSearchParams(window.location.search);
+
+const id = params.get("id");
+
+const preview = document.getElementById("preview");
+
+// LOAD PRODUCT
+async function loadProduct() {
+
+  try {
+
+    const response = await fetch("/api/products");
+
+    const products = await response.json();
+
+    const product = products.find(p => p._id === id);
+
+    if (!product) {
+      alert("Product not found");
+      return;
+    }
+
+    document.getElementById("title").value = product.title;
+
+    document.getElementById("price").value = product.price;
+
+    document.getElementById("category").value = product.category;
+
+    document.getElementById("description").value = product.description;
+
+    document.getElementById("specifications").value =
+      JSON.stringify(product.specifications);
+
+    // SHOW IMAGE
+    preview.innerHTML = "";
+
+    if (product.images && product.images.length > 0) {
+
+      product.images.forEach(img => {
+
+        preview.innerHTML += `
+          <img
+            src="${img}"
+            width="100"
+            style="margin:10px;border-radius:10px;"
+          />
+        `;
+
+      });
+
+    }
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+}
+
+loadProduct();
+
+
+// UPDATE PRODUCT
+document.getElementById("editForm")
+.addEventListener("submit", async (e) => {
+
+  e.preventDefault();
+
+  try {
+
+    const formData = new FormData();
+
+    formData.append(
+      "title",
+      document.getElementById("title").value
+    );
+
+    formData.append(
+      "price",
+      document.getElementById("price").value
+    );
+
+    formData.append(
+      "category",
+      document.getElementById("category").value
+    );
+
+    formData.append(
+      "description",
+      document.getElementById("description").value
+    );
+
+    // FIX SPECIFICATIONS
+    const specsText =
+      document.getElementById("specifications").value;
+
+    let specsArray = [];
+
+    try {
+
+      specsArray = JSON.parse(specsText);
+
+    } catch {
+
+      specsArray = [specsText];
+
+    }
+
+    formData.append(
+      "specifications",
+      JSON.stringify(specsArray)
+    );
+
+    const files =
+      document.getElementById("images").files;
+
+    for (let i = 0; i < files.length; i++) {
+
+      formData.append("images", files[i]);
+
+    }
+
+    // IMPORTANT
+    const response = await fetch(`/api/products/${id}`, {
+
+      method: "PUT",
+
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+
+      body: formData
+
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+
+    alert("Product updated successfully");
+
+    window.location.href = "/admin/dashboard";
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>

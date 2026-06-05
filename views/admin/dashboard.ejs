@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Dashboard</title>
+
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <h2>SolarTech</h2>
+
+    <ul>
+      <li>Dashboard</li>
+      <li>Products</li>
+      <li>Add Product</li>
+      <li>Categories</li>
+      <li>Settings</li>
+
+      <li id="logoutBtn">Logout</li>
+    </ul>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <h1>Admin Dashboard</h1>
+
+    <!-- DASHBOARD CARDS -->
+    <div class="dashboard-cards">
+
+      <div class="card">
+        <h3>Total Products</h3>
+        <p id="totalProducts">0</p>
+      </div>
+
+      <div class="card">
+        <h3>Total Categories</h3>
+        <p id="totalCategories">0</p>
+      </div>
+
+    </div>
+
+    <!-- PRODUCT FORM -->
+    <form id="productForm" class="product-form">
+
+      <input type="text" id="title" placeholder="Product Title" required>
+      <input type="text" id="category" placeholder="Category" required>
+      <input type="text" id="price" placeholder="Price" required>
+
+      <textarea id="description" placeholder="Description" required></textarea>
+
+      <textarea id="specifications"
+        placeholder='["500W","25 Years Warranty"]'
+        required></textarea>
+
+      <input type="file" id="images" multiple required>
+
+      <!-- 🔥 IMAGE PREVIEW (ADDED) -->
+      <div id="preview"
+        style="margin-top:15px; display:flex; flex-wrap:wrap; gap:10px;">
+      </div>
+
+      <button type="submit">Upload Product</button>
+
+    </form>
+
+    <!-- PRODUCTS TABLE -->
+     <div class="table-wrapper">
+    <div class="products-section">
+
+      <h1>Products</h1>
+
+      <table class="product-table">
+
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="productTable">
+          <!-- JS loads products here -->
+        </tbody>
+
+      </table>
+
+    </div>
+</div>
+    <!-- OLD GRID (OPTIONAL - COMMENTED OUT) -->
+    <!--
+    <div id="productsContainer"></div>
+    -->
+
+  </main>
+
+</div>
+
+<script src="/js/dashboard.js"></script>
+
+</body>
+</html>
